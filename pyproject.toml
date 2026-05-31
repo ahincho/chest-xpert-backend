@@ -1,0 +1,37 @@
+[project]
+name = "chest-xpert-backend"
+version = "2.0.0"
+description = "Chest-Xpert AI Inference API — FastAPI backend with ONNX Runtime"
+requires-python = ">=3.14"
+dependencies = [
+    "fastapi>=0.136.0",
+    "uvicorn[standard]>=0.46.0",
+    "onnxruntime>=1.25.0",
+    "numpy>=2.3.0",
+    "pillow>=12.2.0",
+    "pydantic>=2.13.0",
+    "pydantic-settings>=2.14.0",
+    "python-multipart>=0.0.20",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.4.0",
+    "pytest-asyncio>=1.0.0",
+    "hypothesis>=6.130.0",
+    "httpx>=0.28.0",
+    "pandas>=2.2.0",
+    "requests>=2.32.0",
+    "python-dotenv>=1.0.0",
+    "kaggle>=1.6.0",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+
+[tool.hatch.build.targets.wheel]
+packages = ["app"]
