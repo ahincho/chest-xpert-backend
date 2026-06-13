@@ -40,18 +40,24 @@ hypothesis_settings.load_profile("default")
 @pytest.fixture
 def model_path() -> Path:
     """Return the path to the ONNX model, skipping if not found."""
-    # Relative to chest-xpert-backend/
-    path = (
+    # First: check if model exists in the backend repo itself (production layout)
+    local_path = Path(__file__).resolve().parent.parent / "models" / "chest-xpert-model.onnx"
+    if local_path.exists():
+        return local_path
+
+    # Fallback: check sibling repo (development layout)
+    sibling_path = (
         Path(__file__).resolve().parent.parent
         / ".."
         / "chest-xpert-ai"
         / "models"
         / "chest-xpert-model.onnx"
-    )
-    path = path.resolve()
-    if not path.exists():
-        pytest.skip(f"ONNX model not found at {path}")
-    return path
+    ).resolve()
+    if sibling_path.exists():
+        return sibling_path
+
+    pytest.skip(f"ONNX model not found at {local_path} or {sibling_path}")
+    return local_path  # unreachable, satisfies type checker
 
 
 # ---------------------------------------------------------------------------
