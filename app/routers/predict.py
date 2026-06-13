@@ -71,13 +71,23 @@ async def predict(
     """Process a chest X-ray image and return pathology predictions."""
     # Read file bytes
     file_bytes = await file.read()
+    file_size_kb = len(file_bytes) / 1024
+
+    logger.info(
+        "Prediction request received: filename=%s, size=%.1fKB, content_type=%s",
+        file.filename,
+        file_size_kb,
+        file.content_type,
+    )
 
     # Validate file size
     if len(file_bytes) > _MAX_FILE_SIZE:
+        logger.warning("File too large: %.1fKB (max 10MB)", file_size_kb)
         raise FileTooLargeError()
 
     # Validate image format via content type
     if file.content_type not in _ALLOWED_CONTENT_TYPES:
+        logger.warning("Invalid content type rejected: %s", file.content_type)
         return JSONResponse(
             status_code=400,
             content={
@@ -89,6 +99,7 @@ async def predict(
     # Run RGB-Diff filter
     filter_result = filter_service.validate(file_bytes)
     if not filter_result.passed:
+        logger.info("Image rejected by RGB-Diff filter: %s", file.filename)
         return JSONResponse(
             status_code=200,
             content={
@@ -122,6 +133,16 @@ async def predict(
     # Record custom metrics
     record_prediction()
     record_inference_duration(inference_time)
+
+    # Log prediction results
+    results_str = ", ".join(
+        f"{p}={v:.3f}" for p, v in zip(settings.target_classes, predictions, strict=True)
+    )
+    logger.info(
+        "Prediction completed in %.1fms: %s",
+        inference_time * 1000,
+        results_str,
+    )
 
     # Build response
     prediction_items = [
