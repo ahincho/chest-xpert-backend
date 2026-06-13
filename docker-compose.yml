@@ -2,32 +2,40 @@
 # Docker Compose — Chest-Xpert Backend + Observability Stack
 # =============================================================================
 # Services:
-#   - backend: FastAPI API with ONNX model (instrumented with OpenTelemetry)
-#   - otel-lgtm: Grafana LGTM all-in-one (OTel Collector + Mimir + Tempo + Loki + Grafana)
+#   - chest-xpert-backend: FastAPI API with ONNX model (instrumented with OpenTelemetry)
+#   - chest-xpert-otel-lgtm: Grafana LGTM all-in-one (OTel Collector + Mimir + Tempo + Loki + Grafana)
 #
 # Usage:
 #   docker compose up -d
-#   API:     http://localhost:8000
+#   API:     http://localhost:8000/docs
 #   Grafana: http://localhost:3000 (admin/admin)
-#   Swagger: http://localhost:8000/docs
+#
+# View traces:
+#   Grafana → Explore → Select "Tempo" datasource → Search → Run query
 # =============================================================================
+
+networks:
+  chest-xpert-network:
+    driver: bridge
 
 services:
   # --- Chest-Xpert Backend API ---
-  backend:
+  chest-xpert-backend:
+    container_name: chest-xpert-backend
+    image: chest-xpert-backend:latest
     build: .
     ports:
       - "8000:8000"
     environment:
-      # Enable OpenTelemetry instrumentation
       - OTEL_ENABLED=true
-      - OTEL_EXPORTER_OTLP_ENDPOINT=http://otel-lgtm:4317
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://chest-xpert-otel-lgtm:4317
       - OTEL_ENVIRONMENT=development
-      # App config
       - CHEST_XPERT_MODEL_PATH=models/chest-xpert-model.onnx
       - CHEST_XPERT_CORS_ORIGINS=["http://localhost:4200","http://localhost:3000"]
+    networks:
+      - chest-xpert-network
     depends_on:
-      otel-lgtm:
+      chest-xpert-otel-lgtm:
         condition: service_started
     healthcheck:
       test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
@@ -37,11 +45,14 @@ services:
       retries: 3
 
   # --- Grafana LGTM Stack (OTel Collector + Mimir + Tempo + Loki + Grafana) ---
-  otel-lgtm:
+  chest-xpert-otel-lgtm:
+    container_name: chest-xpert-otel-lgtm
     image: grafana/otel-lgtm:latest
     ports:
       - "3000:3000"   # Grafana UI
       - "4317:4317"   # OTLP gRPC receiver
       - "4318:4318"   # OTLP HTTP receiver
+    networks:
+      - chest-xpert-network
     environment:
       - GF_SECURITY_ADMIN_PASSWORD=admin
