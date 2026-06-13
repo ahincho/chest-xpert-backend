@@ -98,4 +98,5 @@ HEALTHCHECK --interval=30s --timeout=5s --start-period=15s --retries=3 \
 
 # Entrypoint: uvicorn in exec form for proper PID 1 signal handling
 # Single worker — appropriate for CPU-bound ONNX inference
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--workers", "1"]
+# Uses python -m to avoid shebang path issues from multi-stage builds
+CMD ["python", "-m", "uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--workers", "1"]
