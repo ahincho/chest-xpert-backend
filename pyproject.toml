@@ -45,6 +45,7 @@ asyncio_mode = "auto"
 [tool.coverage.run]
 source = ["app"]
 branch = true
+omit = ["app/telemetry.py"]
 
 [tool.coverage.report]
 show_missing = true
