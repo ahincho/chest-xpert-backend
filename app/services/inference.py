@@ -6,11 +6,13 @@ import numpy as np
 import onnxruntime as ort
 from numpy.typing import NDArray
 
+
 class InferenceService:
     """Manages the ONNX Runtime inference session for chest X-ray classification.
     Loads the ONNX model on construction and provides a predict method
     that accepts a preprocessed tensor and returns pathology probabilities.
     """
+
     def __init__(self, model_path: str) -> None:
         """Load the ONNX model from the given path.
         Args:
@@ -21,9 +23,7 @@ class InferenceService:
         """
         path = Path(model_path)
         if not path.is_file():
-            raise FileNotFoundError(
-                f"ONNX model file not found at: {model_path}"
-            )
+            raise FileNotFoundError(f"ONNX model file not found at: {model_path}")
         self.session = ort.InferenceSession(model_path)
 
     def predict(self, tensor: NDArray[np.float32]) -> NDArray[np.float32]:

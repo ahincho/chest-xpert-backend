@@ -6,12 +6,14 @@ Environment variables take precedence over .env file values.
 from pydantic import Field, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
+
 class Settings(BaseSettings):
     """Centralized application settings loaded from .env file and environment variables.
     All fields use the prefix CHESTXPERT_ for environment variable loading.
     For example, CHESTXPERT_MODEL_PATH overrides model_path.
     A .env file in the project root is loaded automatically if present.
     """
+
     model_path: str = Field(
         default="models/chest-xpert-model.onnx",
         max_length=255,
@@ -58,5 +60,5 @@ class Settings(BaseSettings):
             if val < 0.0 or val > 255.0:
                 return 5.0
             return val
-        except (TypeError, ValueError):
+        except TypeError, ValueError:
             return 5.0

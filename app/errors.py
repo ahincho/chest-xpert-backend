@@ -12,9 +12,12 @@ from fastapi.responses import JSONResponse
 
 logger = logging.getLogger(__name__)
 
+
 class FileTooLargeError(Exception):
     """Raised when an uploaded file exceeds the maximum allowed size (10MB)."""
+
     pass
+
 
 def register_exception_handlers(app: FastAPI) -> None:
     """Register all custom exception handlers on the FastAPI application."""
@@ -25,7 +28,12 @@ def register_exception_handlers(app: FastAPI) -> None:
     ) -> JSONResponse:
         """Handle request validation errors → 422 with ErrorResponse schema."""
         detail_str = str(exc.errors())[:1000]
-        logger.warning("Validation error on %s %s: %s", request.method, request.url.path, detail_str)
+        logger.warning(
+            "Validation error on %s %s: %s",
+            request.method,
+            request.url.path,
+            detail_str,
+        )
         return JSONResponse(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
             content={
@@ -36,9 +44,7 @@ def register_exception_handlers(app: FastAPI) -> None:
         )
 
     @app.exception_handler(FileTooLargeError)
-    async def file_too_large_handler(
-        request: Request, exc: FileTooLargeError
-    ) -> JSONResponse:
+    async def file_too_large_handler(request: Request, exc: FileTooLargeError) -> JSONResponse:
         """Handle file size exceeding 10MB → 413."""
         logger.warning("File too large on %s %s", request.method, request.url.path)
         return JSONResponse(
@@ -50,9 +56,7 @@ def register_exception_handlers(app: FastAPI) -> None:
         )
 
     @app.exception_handler(Exception)
-    async def generic_exception_handler(
-        request: Request, exc: Exception
-    ) -> JSONResponse:
+    async def generic_exception_handler(request: Request, exc: Exception) -> JSONResponse:
         """Handle all unhandled exceptions → 500 with generic message.
         Logs the full exception with traceback at ERROR level but never
         exposes stack traces, file paths, or internal class names in the response.

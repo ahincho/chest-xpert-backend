@@ -32,6 +32,7 @@ router = APIRouter(tags=["predict"])
 _MAX_FILE_SIZE = 10 * 1024 * 1024  # 10 MB
 _ALLOWED_CONTENT_TYPES = {"image/jpeg", "image/png"}
 
+
 @router.post(
     "/predict",
     response_model=PredictionSuccessResponse,
@@ -115,7 +116,7 @@ async def predict(
     # Build response
     prediction_items = [
         PredictionItem(pathology=pathology, probability=float(prob))
-        for pathology, prob in zip(settings.target_classes, predictions)
+        for pathology, prob in zip(settings.target_classes, predictions, strict=True)
     ]
 
     return PredictionSuccessResponse(

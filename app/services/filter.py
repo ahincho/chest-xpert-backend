@@ -6,11 +6,14 @@ from dataclasses import dataclass
 import numpy as np
 from PIL import Image
 
+
 @dataclass
 class FilterResult:
     """Result of the RGB-Diff filter validation."""
+
     passed: bool
     error: str | None = None
+
 
 class FilterService:
     """Validates images by checking chromatic variance between RGB channels.
@@ -18,6 +21,7 @@ class FilterService:
     photographs) are rejected based on mean absolute differences between
     R-G and G-B channels exceeding a configurable threshold.
     """
+
     def __init__(self, threshold: float = 5.0) -> None:
         self.threshold = threshold
 

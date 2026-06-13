@@ -18,6 +18,7 @@ from app.services.inference import InferenceService
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Manage application lifecycle: load model on startup, release on shutdown."""
@@ -30,10 +31,10 @@ async def lifespan(app: FastAPI):
         logger.info("ONNX model loaded successfully")
     except FileNotFoundError as exc:
         logger.critical("Model file not found: %s", exc)
-        raise SystemExit(1)
+        raise SystemExit(1) from exc
     except Exception as exc:
         logger.critical("Failed to load ONNX model: %s", exc)
-        raise SystemExit(1)
+        raise SystemExit(1) from exc
 
     app.state.filter_service = FilterService(threshold=settings.rgb_diff_threshold)
     logger.info("FilterService initialized with threshold=%.1f", settings.rgb_diff_threshold)
@@ -43,6 +44,7 @@ async def lifespan(app: FastAPI):
     # Shutdown: release resources
     app.state.inference_service.close()
     logger.info("ONNX session released")
+
 
 def create_app() -> FastAPI:
     """Create and configure the FastAPI application."""
@@ -74,5 +76,6 @@ def create_app() -> FastAPI:
     register_exception_handlers(app)
 
     return app
+
 
 app = create_app()

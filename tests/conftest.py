@@ -12,7 +12,8 @@ from pathlib import Path
 
 import numpy as np
 import pytest
-from hypothesis import settings as hypothesis_settings, HealthCheck
+from hypothesis import HealthCheck
+from hypothesis import settings as hypothesis_settings
 from PIL import Image
 
 # ---------------------------------------------------------------------------
@@ -35,11 +36,18 @@ hypothesis_settings.load_profile("default")
 # Model path fixture
 # ---------------------------------------------------------------------------
 
+
 @pytest.fixture
 def model_path() -> Path:
     """Return the path to the ONNX model, skipping if not found."""
     # Relative to chest-xpert-backend/
-    path = Path(__file__).resolve().parent.parent / ".." / "chest-xpert-ai" / "models" / "chest-xpert-model.onnx"
+    path = (
+        Path(__file__).resolve().parent.parent
+        / ".."
+        / "chest-xpert-ai"
+        / "models"
+        / "chest-xpert-model.onnx"
+    )
     path = path.resolve()
     if not path.exists():
         pytest.skip(f"ONNX model not found at {path}")
@@ -49,6 +57,7 @@ def model_path() -> Path:
 # ---------------------------------------------------------------------------
 # Test client fixture
 # ---------------------------------------------------------------------------
+
 
 @pytest.fixture
 def test_client(model_path: Path):
@@ -78,6 +87,7 @@ def test_client(model_path: Path):
 # ---------------------------------------------------------------------------
 # Sample image fixtures
 # ---------------------------------------------------------------------------
+
 
 @pytest.fixture
 def grayscale_image_bytes() -> bytes:

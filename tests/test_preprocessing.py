@@ -8,10 +8,13 @@ from PIL import Image
 
 from app.services.preprocessing import PreprocessingService
 
+
 class TestPreprocessingService:
     """Tests for PreprocessingService.preprocess()."""
 
-    def _make_image_bytes(self, mode: str = "RGB", size: tuple = (100, 100), fmt: str = "PNG") -> bytes:
+    def _make_image_bytes(
+        self, mode: str = "RGB", size: tuple = (100, 100), fmt: str = "PNG"
+    ) -> bytes:
         """Helper to create image bytes for testing."""
         img = Image.new(mode, size, color=128)
         buf = io.BytesIO()

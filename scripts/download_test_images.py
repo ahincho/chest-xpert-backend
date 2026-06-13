@@ -56,7 +56,7 @@ NIH_LABEL_MAP = {
     "Edema": "Edema",
     "Consolidation": "Consolidation",
     "Atelectasis": "Atelectasis",
-    "Pleural Effusion": "Effusion",   # NIH uses "Effusion", not "Pleural Effusion"
+    "Pleural Effusion": "Effusion",  # NIH uses "Effusion", not "Pleural Effusion"
     "No Finding": "No Finding",
 }
 
@@ -65,9 +65,18 @@ OUTPUT_DIR = Path("tests/images")
 # Images are split across 12 zip archives in the dataset.
 # Each archive covers a range of image files.
 IMAGE_ARCHIVES = [
-    "images_001", "images_002", "images_003", "images_004",
-    "images_005", "images_006", "images_007", "images_008",
-    "images_009", "images_010", "images_011", "images_012",
+    "images_001",
+    "images_002",
+    "images_003",
+    "images_004",
+    "images_005",
+    "images_006",
+    "images_007",
+    "images_008",
+    "images_009",
+    "images_010",
+    "images_011",
+    "images_012",
 ]
 
 # ---------------------------------------------------------------------------
@@ -103,7 +112,7 @@ def get_images_per_class(env: dict[str, str]) -> int:
     """Read KAGGLE_IMAGES_PER_CLASS from env, default 10."""
     try:
         return max(1, int(env.get("KAGGLE_IMAGES_PER_CLASS", "10")))
-    except (ValueError, TypeError):
+    except ValueError, TypeError:
         return 10
 
 
@@ -215,7 +224,7 @@ def find_archive_for(filename: str, df: pd.DataFrame) -> str | None:
         # Each archive covers ~9000 patients; archive index = patient_id // 9000
         archive_idx = min(patient_id // 9000, len(IMAGE_ARCHIVES) - 1)
         return IMAGE_ARCHIVES[archive_idx]
-    except (ValueError, IndexError):
+    except ValueError, IndexError:
         return None
 
 

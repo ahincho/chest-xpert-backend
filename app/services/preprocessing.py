@@ -6,6 +6,7 @@ import numpy as np
 from numpy.typing import NDArray
 from PIL import Image, UnidentifiedImageError
 
+
 class PreprocessingService:
     """Handles image preprocessing for the chest X-ray classification model."""
 
@@ -25,10 +26,10 @@ class PreprocessingService:
         try:
             img = Image.open(io.BytesIO(image_bytes))
             img.load()  # Force full decode to catch truncated/corrupt images
-        except UnidentifiedImageError:
-            raise ValueError("Cannot decode image: file is not a valid image format.")
+        except UnidentifiedImageError as exc:
+            raise ValueError("Cannot decode image: file is not a valid image format.") from exc
         except Exception as e:
-            raise ValueError(f"Cannot decode image: {e}")
+            raise ValueError(f"Cannot decode image: {e}") from e
 
         img_gray = img.convert("L")
         img_resized = img_gray.resize((224, 224))
