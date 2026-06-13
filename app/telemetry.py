@@ -35,10 +35,7 @@ def setup_telemetry(app: FastAPI) -> None:
         from opentelemetry.sdk.trace import TracerProvider
         from opentelemetry.sdk.trace.export import BatchSpanProcessor
     except ImportError:
-        logger.warning(
-            "OpenTelemetry packages not installed. "
-            "Install with: uv sync --extra otel"
-        )
+        logger.warning("OpenTelemetry packages not installed. Install with: uv sync --extra otel")
         return
 
     # Configure resource (service identity)
