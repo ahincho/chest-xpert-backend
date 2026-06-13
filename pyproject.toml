@@ -1,6 +1,6 @@
 [project]
 name = "chest-xpert-backend"
-version = "1.4.1"
+version = "1.4.2"
 description = "Chest-Xpert AI Inference API — FastAPI backend with ONNX Runtime"
 requires-python = ">=3.14"
 dependencies = [
