@@ -111,7 +111,17 @@ async def predict(
         )
 
     # Run inference
+    import time
+
+    from app.telemetry import record_inference_duration, record_prediction
+
+    t0 = time.perf_counter()
     predictions = inference_service.predict(tensor)
+    inference_time = time.perf_counter() - t0
+
+    # Record custom metrics
+    record_prediction()
+    record_inference_duration(inference_time)
 
     # Build response
     prediction_items = [
