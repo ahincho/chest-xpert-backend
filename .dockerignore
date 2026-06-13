@@ -1,4 +1,12 @@
-# Virtual environment
+# =============================================================
+# .dockerignore — Chest-Xpert Backend
+# =============================================================
+# Excludes files not needed in the Docker build context.
+# Reduces build context size and prevents secrets from leaking.
+# NOTE: models/ is NOT excluded — model is embedded in the image.
+# =============================================================
+
+# Virtual environment (rebuilt inside container)
 .venv/
 venv/
 
@@ -7,30 +15,37 @@ __pycache__/
 *.py[cod]
 *$py.class
 *.pyo
-.pytest_cache
+.pytest_cache/
 
-# Tests
+# Tests (not needed in production image)
 tests/
 
-# IDE
+# Scripts (dev tooling, not needed at runtime)
+scripts/
+
+# IDE and editor files
 .vscode/
 .idea/
 *.swp
 *.swo
+*~
 
-# Git
+# Git metadata
 .git/
 .gitignore
+.gitattributes
 
-# Environment files (should be injected at runtime)
+# Environment files (secrets injected at runtime, never baked in)
 .env
 
-# OS files
+# OS-specific files
 .DS_Store
 Thumbs.db
 
-# Models (should be mounted as volume in production)
-models/
-
-# Documentation
+# Documentation (not needed in image)
 *.md
+LICENSE
+
+# Distribution artifacts
+dist/
+*.egg-info/

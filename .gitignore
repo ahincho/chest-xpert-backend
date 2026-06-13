@@ -6,10 +6,13 @@ venv/
 __pycache__/
 *.py[cod]
 *$py.class
-.pytest_cache
+.pytest_cache/
+
+# Ruff cache
+.ruff_cache/
 
 # Python testing
-tests/images
+tests/images/
 
 # Environment variables (contains secrets)
 .env
@@ -17,6 +20,8 @@ tests/images
 # IDE
 .vscode/
 .idea/
+*.swp
+*.swo
 
 # OS
 .DS_Store
@@ -25,3 +30,6 @@ Thumbs.db
 # Distribution
 dist/
 *.egg-info/
+
+# Semantic release
+CHANGELOG.md
