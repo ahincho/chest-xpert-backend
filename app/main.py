@@ -75,6 +75,11 @@ def create_app() -> FastAPI:
     # Error handlers
     register_exception_handlers(app)
 
+    # OpenTelemetry instrumentation (only if OTEL_ENABLED=true)
+    from app.telemetry import setup_telemetry
+
+    setup_telemetry(app)
+
     return app
 
 

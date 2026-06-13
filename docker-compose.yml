@@ -1,0 +1,47 @@
+# =============================================================================
+# Docker Compose — Chest-Xpert Backend + Observability Stack
+# =============================================================================
+# Services:
+#   - backend: FastAPI API with ONNX model (instrumented with OpenTelemetry)
+#   - otel-lgtm: Grafana LGTM all-in-one (OTel Collector + Mimir + Tempo + Loki + Grafana)
+#
+# Usage:
+#   docker compose up -d
+#   API:     http://localhost:8000
+#   Grafana: http://localhost:3000 (admin/admin)
+#   Swagger: http://localhost:8000/docs
+# =============================================================================
+
+services:
+  # --- Chest-Xpert Backend API ---
+  backend:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      # Enable OpenTelemetry instrumentation
+      - OTEL_ENABLED=true
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://otel-lgtm:4317
+      - OTEL_ENVIRONMENT=development
+      # App config
+      - CHEST_XPERT_MODEL_PATH=models/chest-xpert-model.onnx
+      - CHEST_XPERT_CORS_ORIGINS=["http://localhost:4200","http://localhost:3000"]
+    depends_on:
+      otel-lgtm:
+        condition: service_started
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      interval: 30s
+      timeout: 5s
+      start_period: 15s
+      retries: 3
+
+  # --- Grafana LGTM Stack (OTel Collector + Mimir + Tempo + Loki + Grafana) ---
+  otel-lgtm:
+    image: grafana/otel-lgtm:latest
+    ports:
+      - "3000:3000"   # Grafana UI
+      - "4317:4317"   # OTLP gRPC receiver
+      - "4318:4318"   # OTLP HTTP receiver
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
