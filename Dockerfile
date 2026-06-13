@@ -36,14 +36,14 @@ COPY pyproject.toml uv.lock ./
 
 # Layer 2: Install deps without the project itself (intermediate layer optimization)
 RUN --mount=type=cache,target=/root/.cache/uv \
-    uv sync --frozen --no-dev --no-install-project
+    uv sync --frozen --no-dev --extra otel --no-install-project
 
 # Layer 3: Copy application source (changes frequently)
 COPY app/ ./app/
 
 # Layer 4: Install the project in non-editable mode (no source dependency in .venv)
 RUN --mount=type=cache,target=/root/.cache/uv \
-    uv sync --frozen --no-dev --no-editable
+    uv sync --frozen --no-dev --extra otel --no-editable
 
 
 # --- Stage 2: Production runtime (minimal) ---
@@ -84,7 +84,9 @@ ENV PATH="/app/.venv/bin:$PATH" \
     PYTHONFAULTHANDLER=1 \
     # Application defaults (overridable at runtime via -e)
     CHEST_XPERT_MODEL_PATH="models/chest-xpert-model.onnx" \
-    CHEST_XPERT_SERVER_PORT="8000"
+    CHEST_XPERT_SERVER_PORT="8000" \
+    # OTel disabled by default — activate with -e OTEL_ENABLED=true
+    OTEL_ENABLED="false"
 
 # Switch to non-root user — all subsequent commands run as chest-xpert
 USER chest-xpert
